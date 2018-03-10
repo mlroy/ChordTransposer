@@ -5,6 +5,25 @@
 //  Created by Michael Roy on 2/26/18.
 //  Copyright © 2018 Quebecois Engineering. All rights reserved.
 //
+// Useful concepts:  UIPickerView, view/data/delegate/controller,
+//                   Swift Language, Classes & initialization, Debugging
+//                   Splash Screen
+//
+//  Next Steps:
+//     - Complete the CircleOfFiftsPickerViewDelegate and CircleOfFifthsPickerViewDataSource
+//       May be easier to have those as a single class, then split up to understand
+//     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
+//     - Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
+//     - Convert to 2 sharp/flat key switches, one for starting and one for target keys;
+//         fix font sizes
+//     - Create a major/minor key switch
+//     - Solve the problem for special keys whose chords are not written correctly.
+//         e.g., F has 1 flat (shown with A#), C has no accidentals (shown with E#),
+//         All keys Sharps: C, C# (B not C as vii), D# (B#, Cx),
+//                   Flats: A, B, D, E, G 
+//     - Display major/minor/diminished for chord symbols. (tuple?  I: (0, ""), ii: (2, "m"), viidim: (7, "dim")
+//     - Device adjustable display (iphone 6, 7, 8, etc)
+//     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
 
 import UIKit
 import os.log
