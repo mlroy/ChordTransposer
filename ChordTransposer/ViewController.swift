@@ -13,7 +13,7 @@
 //     - Complete the CircleOfFiftsPickerViewDelegate and CircleOfFifthsPickerViewDataSource
 //       May be easier to have those as a single class, then split up to understand
 //     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
-//     - Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
+//     X Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
 //     - Convert to 2 sharp/flat key switches, one for starting and one for target keys;
 //         fix font sizes
 //     - Create a major/minor key switch
@@ -34,10 +34,13 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var sharpsOrFlatsSwitch: UISwitch!
     @IBOutlet weak var startingKeyPickerView: UIPickerView!
     @IBOutlet weak var startingKeyChords: UILabel!
+    @IBOutlet weak var targetKeyPickerView: UIPickerView!
+    @IBOutlet weak var targetKeyChords: UILabel!
+    @IBOutlet weak var fretForCapo: UILabel!
     
     
-    //MARK: local data
-    let circleOfFifthsSharps: [String] = ["A ", "A♯", "B ", "C ", "C♯", "D ", "D♯", "E ", "E♯", "F♯", "G ", "G♯"]
+    //MARK: local constants
+    let circleOfFifthsSharps: [String] = ["A ", "A♯", "B ", "C ", "C♯", "D ", "D♯", "E ", "F ", "F♯", "G ", "G♯"]
     let circleOfFifthsFlats: [String]  = ["A ", "B♭", "B ", "C ", "D♭", "D ", "E♭", "E ", "F ", "G♭", "G ", "A♭"]
     // majorKeySteps is an array of the number of half-steps between the current
     // chord and the next chord in the key.
@@ -46,17 +49,29 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // Minor Key chord structure:  i ii(dim) III iv v VI VII
     let minorKeySteps: [Int] = [2, 1, 2, 2, 1, 2]
     
+    //MARK: local vars
+    // var targetKeyPickerDelegate :CircleOfFifthsPickerViewDelegate
+    
+    //MARK: boiler plate
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     
         self.startingKeyPickerView.delegate = self
         self.startingKeyPickerView.dataSource = self
+        //
+        self.targetKeyPickerView.delegate = self
+        self.targetKeyPickerView.dataSource = self
         
-        // self.startingKeyChords.text = constructChordsInKey(keyOffset: 0, majorKey: true)
+        // starting key chords
         self.startingKeyChords.text = constructChordsInKey(
            keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
            majorKey: true)
+        // target key chords
+        self.targetKeyChords.text = constructChordsInKey(keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
+            majorKey: true)
+        // Capo
+        updateCapo()
     }
 
     @IBAction func sharpsOrFlatsToggled(_ sender: UISwitch) {
@@ -65,15 +80,22 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             self.startingKeyChords.text = constructChordsInKey(
                 keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
                 majorKey: true)
+            self.targetKeyChords.text = constructChordsInKey(
+                keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
+                majorKey: true)
         }
         else {
             sharpsOrFlatsLabel.text = "Flat Keys"
             self.startingKeyChords.text = constructChordsInKey(
                 keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
                 majorKey: true)
+            self.targetKeyChords.text = constructChordsInKey(
+                keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
+                majorKey: true)
         }
         
         startingKeyPickerView.reloadComponent(0)
+        targetKeyPickerView.reloadComponent(0)
     }
     
     override func didReceiveMemoryWarning() {
@@ -98,6 +120,13 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         return returnKey
     }
     
+    // chordMode is "min", "" (Major) or "dim" for diminished
+    func getChord(keyOffseet row: Int, modeDesignator chordMode: String) {
+    
+        // Have a sharpsOrFlats override for certain keys that are always
+        // sharps (A,B,D,E,G) or flats (F).
+    }
+    
     // Construct a string of all chords in a Key starting with the root.
     func constructChordsInKey(keyOffset keyRow: Int, majorKey: Bool) -> String {
         let modeSteps: [Int] = (majorKey ? majorKeySteps : minorKeySteps)
@@ -109,6 +138,16 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             chords += "\(getKey(keyOffset: nextChordOffset)) "
         }
         return chords;
+    }
+    
+    func updateChords() {
+        
+    }
+    
+    func updateCapo() {
+        self.fretForCapo.text = String(
+            abs(((self.targetKeyPickerView.selectedRow(inComponent: 0)) -
+                (self.startingKeyPickerView.selectedRow(inComponent: 0))) % circleOfFifthsSharps.count))
     }
     
     //MARK: UIPickerViewDataSource
@@ -138,7 +177,14 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         os_log("Starting Key Selected", log: OSLog.default, type: .debug)
         
-        self.startingKeyChords.text = constructChordsInKey(keyOffset: row, majorKey: true)
+        self.startingKeyChords.text = constructChordsInKey(
+            keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
+            majorKey: true)
+        self.targetKeyChords.text = constructChordsInKey(
+            keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
+            majorKey: true)
+        //
+        updateCapo()
     }
 
 }
