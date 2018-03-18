@@ -37,6 +37,9 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var targetKeyPickerView: UIPickerView!
     @IBOutlet weak var targetKeyChords: UILabel!
     @IBOutlet weak var fretForCapo: UILabel!
+    @IBOutlet weak var targetSharpsOrFlatsLabel: UILabel!
+    @IBOutlet weak var targetKeySharpsOrFlatsSwitch: UISwitch!
+    
     
     
     //MARK: local constants
@@ -63,13 +66,8 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         self.targetKeyPickerView.delegate = self
         self.targetKeyPickerView.dataSource = self
         
-        // starting key chords
-        self.startingKeyChords.text = constructChordsInKey(
-           keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-           majorKey: true)
-        // target key chords
-        self.targetKeyChords.text = constructChordsInKey(keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true)
+        //
+        updateChords()
         // Capo
         updateCapo()
     }
@@ -77,25 +75,27 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBAction func sharpsOrFlatsToggled(_ sender: UISwitch) {
         if (sender.isOn) {
             sharpsOrFlatsLabel.text = "Sharp Keys"
-            self.startingKeyChords.text = constructChordsInKey(
-                keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-                majorKey: true)
-            self.targetKeyChords.text = constructChordsInKey(
-                keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-                majorKey: true)
+            updateChords()
         }
         else {
             sharpsOrFlatsLabel.text = "Flat Keys"
-            self.startingKeyChords.text = constructChordsInKey(
-                keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-                majorKey: true)
-            self.targetKeyChords.text = constructChordsInKey(
-                keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-                majorKey: true)
+            updateChords()
         }
         
         startingKeyPickerView.reloadComponent(0)
+        os_log("Starting Sharp Keys toggled", log: OSLog.default, type: .debug)
+    }
+    
+    @IBAction func targetSharpsOrFlatsToggled(_ sender: UISwitch) {
+        if (sender.isOn) {
+            targetSharpsOrFlatsLabel.text = "Sharp Keys"
+        }
+        else {
+            targetSharpsOrFlatsLabel.text = "Flat Keys"
+        }
+        
         targetKeyPickerView.reloadComponent(0)
+        os_log("Target Sharp Keys toggled", log: OSLog.default, type: .debug)
     }
     
     override func didReceiveMemoryWarning() {
@@ -107,10 +107,10 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     // Returns the Key based on the keyOffset and accounting for the setting of
     // the sharpsOrFlatsSwitch
-    func getKey(keyOffset row: Int) -> String {
+    func getKey(keyOffset row: Int, forSharpKeys: Bool) -> String {
         var returnKey: String = "invalid"
         
-        if (sharpsOrFlatsSwitch.isOn) {
+        if (forSharpKeys) {
             returnKey = self.circleOfFifthsSharps[row]
         }
         else {
@@ -128,20 +128,29 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     // Construct a string of all chords in a Key starting with the root.
-    func constructChordsInKey(keyOffset keyRow: Int, majorKey: Bool) -> String {
+    func constructChordsInKey(keyOffset keyRow: Int, majorKey: Bool, sharpKeys: Bool) -> String {
         let modeSteps: [Int] = (majorKey ? majorKeySteps : minorKeySteps)
         var nextChordOffset = keyRow
-        var chords: String = "\(getKey(keyOffset: nextChordOffset)) "
+        var chords: String = "\(getKey(keyOffset: nextChordOffset, forSharpKeys: sharpKeys)) "
         
         for cOffset in modeSteps {
             nextChordOffset = (nextChordOffset + cOffset) % self.circleOfFifthsSharps.count
-            chords += "\(getKey(keyOffset: nextChordOffset)) "
+            chords += "\(getKey(keyOffset: nextChordOffset, forSharpKeys: sharpKeys)) "
         }
         return chords;
     }
     
     func updateChords() {
-        
+        /*
+        // starting key chords
+        self.startingKeyChords.text = constructChordsInKey(
+            keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
+            majorKey: true, sharpKeys: self.sharpsOrFlatsSwitch.isOn)
+        // target key chords
+        self.targetKeyChords.text = constructChordsInKey(
+            keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
+            majorKey: true, sharpKeys: self.targetSharpsOrFlatsSwitch.isOn)
+ */
     }
     
     func updateCapo() {
@@ -170,20 +179,22 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
 
     // Return the key at the given row
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return self.getKey(keyOffset: row)
+        return self.getKey(keyOffset: row,
+                           // forSharpKeys: targetKeySharpsOrFlatsSwitch.isOn)
+                           forSharpKeys: (pickerView == startingKeyPickerView) ? sharpsOrFlatsSwitch.isOn : targetKeySharpsOrFlatsSwitch.isOn)
     }
     
     // Respond to the selected key
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        os_log("Starting Key Selected", log: OSLog.default, type: .debug)
-        
-        self.startingKeyChords.text = constructChordsInKey(
-            keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true)
-        self.targetKeyChords.text = constructChordsInKey(
-            keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true)
+        if (pickerView == startingKeyPickerView) {
+            os_log("Starting Key Selected", log: OSLog.default, type: .debug)
+        }
+        else {
+            os_log("Target Key Selected", log: OSLog.default, type: .debug)
+        }
+
         //
+        updateChords()
         updateCapo()
     }
 
