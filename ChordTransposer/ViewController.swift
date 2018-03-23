@@ -17,7 +17,7 @@
 //     X Convert to 2 sharp/flat key switches, one for starting and one for target keys;
 //         fix font sizes
 //     - Create a major/minor key segmented control
-//     - Solve the problem for special keys whose chords are not written correctly.
+//     X Solve the problem for special keys whose chords are not written correctly.
 //         e.g., F has 1 flat (shown with A#), C has no accidentals (shown with E#),
 //         All keys Sharps: C, C# (B not C as vii), D# (B#, Cx),
 //                   Flats: A, B, D, E, G 
@@ -123,21 +123,32 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     // chordMode is "min", "" (Major) or "dim" for diminished
     func getChord(keyOffset row: Int, modeDesignator chordMode: String, forSharpKeys: Bool) -> String {
-    
-        // Have a sharpsOrFlats override for certain keys that are always
-        // sharps (A,B,D,E,G) or flats (F).
-        return ("\(getKey(keyOffset: row, forSharpKeys: forSharpKeys))\(chordMode)")
+        return "\(getKey(keyOffset: row, forSharpKeys: forSharpKeys))\(chordMode)"
     }
     
     // Construct a string of all chords in a Key starting with the root.
     func constructChordsInKey(keyOffset keyRow: Int, majorKey: Bool, sharpKeys: Bool) -> String {
         let modeSteps: [(Int, String)] = (majorKey ? majorKeySteps : minorKeySteps)
         var nextChordOffset = keyRow
+        var useSharpKeys: Bool
+        // Root Chord for the key
         var chords: String = "\(getKey(keyOffset: nextChordOffset, forSharpKeys: sharpKeys)) "
+        
+        // adjust useSharpKeys based on the key
+        switch (keyRow) {
+        case 0, 2, 5, 7, 10: // Sharps only keys: (A,B,D,E,G)
+            useSharpKeys = true
+            
+        case 8:  // Flats only key: F
+            useSharpKeys = false
+            
+        default: // all others are based on sharpKeys
+            useSharpKeys = sharpKeys
+        }
         
         for (cOffset, modeStr) in modeSteps {
             nextChordOffset = (nextChordOffset + cOffset) % self.circleOfFifthsSharps.count
-            chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: sharpKeys)) "
+            chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
         }
         return chords;
     }
