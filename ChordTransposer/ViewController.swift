@@ -22,7 +22,7 @@
 //         All keys Sharps: C, C# (B not C as vii), D# (B#, Cx),
 //                   Flats: A, B, D, E, G 
 //     X Display major/minor/diminished for chord symbols. (tuple?  I: (0, ""), ii: (2, "m"), viidim: (7, "dim")
-//     - Convert switches to a segmented control (2 options, Sharps or Flats)
+//     X Convert switches to a segmented control (2 options, Sharps or Flats)
 //     - Device adjustable display (iphone 6, 7, 8, etc)
 //     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
 
@@ -31,25 +31,30 @@ import os.log
 
 class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
-    @IBOutlet weak var sharpsOrFlatsLabel: UILabel!
-    @IBOutlet weak var sharpsOrFlatsSwitch: UISwitch!
+    @IBOutlet weak var startingKeySharpsOrFlats: UISegmentedControl!
     @IBOutlet weak var startingKeyPickerView: UIPickerView!
     @IBOutlet weak var startingKeyChords: UILabel!
     @IBOutlet weak var targetKeyPickerView: UIPickerView!
     @IBOutlet weak var targetKeyChords: UILabel!
     @IBOutlet weak var fretForCapo: UILabel!
-    @IBOutlet weak var targetSharpsOrFlatsLabel: UILabel!
-    @IBOutlet weak var targetKeySharpsOrFlatsSwitch: UISwitch!
+    @IBOutlet weak var targetKeySharpsOrFlats: UISegmentedControl!
     
     //MARK: local constants
     let circleOfFifthsSharps: [String] = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"]
     let circleOfFifthsFlats: [String]  = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"]
-    // majorKeySteps is an array of the number of half-steps between the current
-    // chord and the next chord in the key.
+    /*
+    // majorKeySteps is an array of tuples consisting of:
+    //    1. the number of half-steps between the current chord and the next chord in the key.
+    //    2. a character for the mode of the chord
+    //
     // Major Key chord structure:  I ii iii IV V vi viidim I
+    */
     let majorKeySteps: [(Int, String)] = [(2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
     // Minor Key chord structure:  i ii(dim) III iv v VI VII
     let minorKeySteps: [(Int, String)] = [(2, "○"), (1, ""), (2, "m"), (2, "m"), (1, ""), (2, "")]
+    //
+    let sharpsSelected: Int = 0
+    let flatsSelected:  Int = 1
     
     //MARK: local vars
     // var targetKeyPickerDelegate :CircleOfFifthsPickerViewDelegate
@@ -71,34 +76,19 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         updateCapo()
     }
 
-    @IBAction func sharpsOrFlatsToggled(_ sender: UISwitch) {
-        if (sender.isOn) {
-            sharpsOrFlatsLabel.text = "Sharp Keys"
-            updateChords()
-        }
-        else {
-            sharpsOrFlatsLabel.text = "Flat Keys"
-            updateChords()
-        }
-        
+    
+    @IBAction func startingKeySharpsFlatsToggled(_ sender: UISegmentedControl) {
+        updateChords()
         startingKeyPickerView.reloadComponent(0)
         os_log("Starting Sharp Keys toggled", log: OSLog.default, type: .debug)
     }
     
-    @IBAction func targetSharpsOrFlatsToggled(_ sender: UISwitch) {
-        if (sender.isOn) {
-            targetSharpsOrFlatsLabel.text = "Sharp Keys"
-            updateChords()
-        }
-        else {
-            targetSharpsOrFlatsLabel.text = "Flat Keys"
-            updateChords()
-        }
-        
+    @IBAction func targetSharpsOrFlatsToggled(_ sender: Any) {
+        updateChords()
         targetKeyPickerView.reloadComponent(0)
         os_log("Target Sharp Keys toggled", log: OSLog.default, type: .debug)
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -157,11 +147,13 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         // starting key chords
         self.startingKeyChords.text = constructChordsInKey(
             keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true, sharpKeys: self.sharpsOrFlatsSwitch.isOn)
+            majorKey: true,
+            sharpKeys: self.startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
         // target key chords
         self.targetKeyChords.text = constructChordsInKey(
             keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true, sharpKeys: self.targetKeySharpsOrFlatsSwitch.isOn)
+            majorKey: true,
+            sharpKeys: targetKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
     }
     
     func updateCapo() {
@@ -180,7 +172,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     // The number of rows in a CircleOfFifths picker is the number of keys (sharps or flats)
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent componente: Int) -> Int {
-        if (sharpsOrFlatsSwitch.isOn) {
+        if (startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected) {
             return self.circleOfFifthsSharps.count
         }
         else {
@@ -191,8 +183,9 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // Return the key at the given row
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return self.getKey(keyOffset: row,
-                           // forSharpKeys: targetKeySharpsOrFlatsSwitch.isOn)
-                           forSharpKeys: (pickerView == startingKeyPickerView) ? sharpsOrFlatsSwitch.isOn : targetKeySharpsOrFlatsSwitch.isOn)
+                           forSharpKeys: (pickerView == startingKeyPickerView) ?
+                               startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected :
+                               targetKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
     }
     
     // Respond to the selected key

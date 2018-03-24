@@ -18,21 +18,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Oq5-tR-Gyd">
-                                <rect key="frame" x="136" y="153" width="49" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="onTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <connections>
-                                    <action selector="sharpsOrFlatsToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="1il-gc-Dyc"/>
-                                </connections>
-                            </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Sharp Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dic-3I-kPP">
-                                <rect key="frame" x="42" y="153" width="93" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Chord Transposer" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fDR-FN-h2b">
                                 <rect key="frame" x="16" y="48" width="343" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -115,30 +100,6 @@
                                 <rect key="frame" x="192" y="294" width="167" height="162"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             </pickerView>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Eqq-ZS-gfv">
-                                <rect key="frame" x="304" y="153" width="49" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="onTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <connections>
-                                    <action selector="targetSharpsOrFlatsToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="Dj8-13-20G"/>
-                                </connections>
-                            </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Sharp Keys" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BUR-ll-k6G">
-                                <rect key="frame" x="213" y="153" width="94" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="lQg-dl-KvQ">
-                                <rect key="frame" x="22" y="464" width="160" height="29"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <segments>
-                                    <segment title="Sharps"/>
-                                    <segment title="Flats"/>
-                                </segments>
-                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zYq-4R-kkw">
                                 <rect key="frame" x="88" y="526" width="271" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -152,6 +113,31 @@
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="lQg-dl-KvQ">
+                                <rect key="frame" x="19" y="160" width="160" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Sharps"/>
+                                    <segment title="Flats"/>
+                                </segments>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="startingKeySharpsFlatsToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="Aff-30-9zV"/>
+                                </connections>
+                            </segmentedControl>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="uge-CO-l2k">
+                                <rect key="frame" x="195" y="160" width="160" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Sharps"/>
+                                    <segment title="Flats"/>
+                                </segments>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="startingKeySharpsFlatsToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="v3r-zy-ufR"/>
+                                    <action selector="targetSharpsOrFlatsToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="2wp-0p-lvs"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" red="0.98176683980000001" green="0.96270073779999998" blue="0.86640082470000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="tintColor" red="1" green="0.80000000000000004" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -159,14 +145,12 @@
                     </view>
                     <connections>
                         <outlet property="fretForCapo" destination="ipj-LT-4Z7" id="87d-hY-lqG"/>
-                        <outlet property="sharpsOrFlatsLabel" destination="dic-3I-kPP" id="QOa-xJ-yIN"/>
-                        <outlet property="sharpsOrFlatsSwitch" destination="Oq5-tR-Gyd" id="or5-13-Glr"/>
                         <outlet property="startingKeyChords" destination="zYq-4R-kkw" id="dMd-uW-8Tb"/>
                         <outlet property="startingKeyPickerView" destination="NCn-9Z-IRk" id="1Zq-bP-iCH"/>
+                        <outlet property="startingKeySharpsOrFlats" destination="lQg-dl-KvQ" id="31f-eW-eSi"/>
                         <outlet property="targetKeyChords" destination="GQq-aQ-cH4" id="VSd-ka-69c"/>
                         <outlet property="targetKeyPickerView" destination="ULq-ME-51S" id="wCe-XB-Uwl"/>
-                        <outlet property="targetKeySharpsOrFlatsSwitch" destination="Eqq-ZS-gfv" id="b8c-mM-82l"/>
-                        <outlet property="targetSharpsOrFlatsLabel" destination="BUR-ll-k6G" id="Xuv-ym-ejn"/>
+                        <outlet property="targetKeySharpsOrFlats" destination="uge-CO-l2k" id="ZE5-aH-diR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
