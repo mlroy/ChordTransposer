@@ -17,6 +17,7 @@
 //     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
 //     - Device adjustable display (iphone 6, 7, 8, etc), Vary For Traits in Storyboard editor
 //     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
+//     - Fixme's
 //     X Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
 //     X Convert to 2 sharp/flat key switches, one for starting and one for target keys;
 //         fix font sizes
@@ -55,20 +56,20 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // Major Key chord structure:  I ii iii IV V vi viidim I
     // Minor Key chord structure:  i ii(dim) III iv v VI VII
     */
-    let majorKeySteps: [(Int, String)] = [(2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
-    let minorKeySteps: [(Int, String)] = [(2, "○"), (1, ""), (2, "m"), (2, "m"), (1, ""), (2, "")]
-    //
+    let majorKeySteps: [(Int, String)] = [(0, ""), (2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
+    let minorKeySteps: [(Int, String)] = [(0, "m"), (2, "○"), (1, ""), (2, "m"), (2, "m"), (1, ""), (2, "")]
+    // sharps or flats selector indexes
     let sharpsSelected: Int = 0
     let flatsSelected:  Int = 1
     // mode indexes
-    let modeMajor:  Int = 0
-    let modeMinor: Int = 1
+    let majorModeSelected:  Int = 0
+    let minorModeSelected: Int = 1
     
     //MARK: local vars
     // var targetKeyPickerDelegate :CircleOfFifthsPickerViewDelegate
     // FIXME: poor hack to get initializer to work right - majorKeySteps
     //    key concept: initializers in classes - empty, order of initialization, etc.
-    var modeSelected: [(Int, String)] = [(2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
+    var modeSelected: [(Int, String)] = [(0, ""), (2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
     
     //MARK: boiler plate
     override func viewDidLoad() {
@@ -117,10 +118,10 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // assign modeSelected
     func assignModeSelected() {
         switch (modeSelectSetCtrl.selectedSegmentIndex) {
-        case modeMajor:
+        case majorModeSelected:
             modeSelected = majorKeySteps
             
-        case modeMinor:
+        case minorModeSelected:
             modeSelected = minorKeySteps
         
         // FIXME: change to report an error
@@ -156,7 +157,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         var nextChordOffset = keyRow
         var useSharpKeys: Bool
         // Root Chord for the key
-        var chords: String = "\(getKey(keyOffset: nextChordOffset, forSharpKeys: sharpKeys)) "
+        var chords: String = ""
         
         // adjust useSharpKeys based on the key
         switch (keyRow) {
@@ -194,6 +195,17 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         self.fretForCapo.text = String(
             abs(((self.targetKeyPickerView.selectedRow(inComponent: 0)) -
                 (self.startingKeyPickerView.selectedRow(inComponent: 0))) % circleOfFifthsSharps.count))
+        /*
+        let startIdx = self.startingKeyPickerView.selectedRow(inComponent: 0)
+        let targetIdx = self.targetKeyPickerView.selectedRow(inComponent: 0)
+        var capoVal = 0
+        var currIdx = startIdx
+        while (currIdx != targetIdx) {
+            currIdx = (currIdx + 1) % modeSelected.count
+            capoVal += 1
+        }
+        fretForCapo.text = String(capoVal)
+        */
     }
     
     //MARK: UIPickerViewDataSource
