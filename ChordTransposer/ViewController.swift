@@ -10,21 +10,24 @@
 //                   Splash Screen
 //
 //  Next Steps:
+//     X Create a major/minor key segmented control
+//     - Fix Capo computation
 //     - Complete the CircleOfFiftsPickerViewDelegate and CircleOfFifthsPickerViewDataSource
 //       May be easier to have those as a single class, then split up to understand
 //     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
+//     - Device adjustable display (iphone 6, 7, 8, etc), Vary For Traits in Storyboard editor
+//     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
 //     X Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
 //     X Convert to 2 sharp/flat key switches, one for starting and one for target keys;
 //         fix font sizes
-//     - Create a major/minor key segmented control
+
 //     X Solve the problem for special keys whose chords are not written correctly.
 //         e.g., F has 1 flat (shown with A#), C has no accidentals (shown with E#),
 //         All keys Sharps: C, C# (B not C as vii), D# (B#, Cx),
 //                   Flats: A, B, D, E, G 
 //     X Display major/minor/diminished for chord symbols. (tuple?  I: (0, ""), ii: (2, "m"), viidim: (7, "dim")
 //     X Convert switches to a segmented control (2 options, Sharps or Flats)
-//     - Device adjustable display (iphone 6, 7, 8, etc)
-//     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
+
 
 import UIKit
 import os.log
@@ -38,26 +41,34 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var targetKeyChords: UILabel!
     @IBOutlet weak var fretForCapo: UILabel!
     @IBOutlet weak var targetKeySharpsOrFlats: UISegmentedControl!
+    @IBOutlet weak var modeSelectSetCtrl: UISegmentedControl!
     
     //MARK: local constants
     let circleOfFifthsSharps: [String] = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"]
     let circleOfFifthsFlats: [String]  = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"]
+    
     /*
     // majorKeySteps is an array of tuples consisting of:
     //    1. the number of half-steps between the current chord and the next chord in the key.
     //    2. a character for the mode of the chord
     //
     // Major Key chord structure:  I ii iii IV V vi viidim I
+    // Minor Key chord structure:  i ii(dim) III iv v VI VII
     */
     let majorKeySteps: [(Int, String)] = [(2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
-    // Minor Key chord structure:  i ii(dim) III iv v VI VII
     let minorKeySteps: [(Int, String)] = [(2, "○"), (1, ""), (2, "m"), (2, "m"), (1, ""), (2, "")]
     //
     let sharpsSelected: Int = 0
     let flatsSelected:  Int = 1
+    // mode indexes
+    let modeMajor:  Int = 0
+    let modeMinor: Int = 1
     
     //MARK: local vars
     // var targetKeyPickerDelegate :CircleOfFifthsPickerViewDelegate
+    // FIXME: poor hack to get initializer to work right - majorKeySteps
+    //    key concept: initializers in classes - empty, order of initialization, etc.
+    var modeSelected: [(Int, String)] = [(2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
     
     //MARK: boiler plate
     override func viewDidLoad() {
@@ -69,6 +80,8 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         //
         self.targetKeyPickerView.delegate = self
         self.targetKeyPickerView.dataSource = self
+        // Set initial mode
+        assignModeSelected()
         
         //
         updateChords()
@@ -89,12 +102,33 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         os_log("Target Sharp Keys toggled", log: OSLog.default, type: .debug)
     }
 
+    @IBAction func modeSelectToggled(_ sender: UISegmentedControl) {
+        assignModeSelected()
+        updateChords()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
     //MARK: Work functions
+    
+    // assign modeSelected
+    func assignModeSelected() {
+        switch (modeSelectSetCtrl.selectedSegmentIndex) {
+        case modeMajor:
+            modeSelected = majorKeySteps
+            
+        case modeMinor:
+            modeSelected = minorKeySteps
+        
+        // FIXME: change to report an error
+        //    key concept: error handling - throwing errors, etc
+        default:
+            modeSelected = majorKeySteps
+        }
+    }
     
     // Returns the Key based on the keyOffset and accounting for the setting of
     // the sharpsOrFlatsSwitch
@@ -117,8 +151,8 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     // Construct a string of all chords in a Key starting with the root.
-    func constructChordsInKey(keyOffset keyRow: Int, majorKey: Bool, sharpKeys: Bool) -> String {
-        let modeSteps: [(Int, String)] = (majorKey ? majorKeySteps : minorKeySteps)
+    func constructChordsInKey(keyOffset keyRow: Int, sharpKeys: Bool) -> String {
+        // let modeSteps: [(Int, String)] = (majorKey ? majorKeySteps : minorKeySteps)
         var nextChordOffset = keyRow
         var useSharpKeys: Bool
         // Root Chord for the key
@@ -136,7 +170,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             useSharpKeys = sharpKeys
         }
         
-        for (cOffset, modeStr) in modeSteps {
+        for (cOffset, modeStr) in modeSelected {
             nextChordOffset = (nextChordOffset + cOffset) % self.circleOfFifthsSharps.count
             chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
         }
@@ -147,12 +181,12 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         // starting key chords
         self.startingKeyChords.text = constructChordsInKey(
             keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true,
+            // majorKey: true,
             sharpKeys: self.startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
         // target key chords
         self.targetKeyChords.text = constructChordsInKey(
             keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-            majorKey: true,
+            // majorKey: true,
             sharpKeys: targetKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
     }
     
