@@ -9,12 +9,10 @@
 import UIKit
 
 class CircleOfFifthsPickerView: UIPickerView {
-    
+  
     /*
     init() {
-        super.init()
-        
-        dataSource = CircleOfFifthsPickerViewDelegate()
+        super.init(coder: <#T##NSCoder#>)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -28,6 +26,5 @@ class CircleOfFifthsPickerView: UIPickerView {
     override func draw(_ rect: CGRect) {
         // Drawing code
     }
-*/
-
+   */
 }

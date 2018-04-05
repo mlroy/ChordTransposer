@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C6B2FF22075BC4300757A9F /* CircleOfFifths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6B2FF12075BC4300757A9F /* CircleOfFifths.swift */; };
 		4CAE7C22204B03D70037C9DB /* CircleOfFifthsPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAE7C21204B03D70037C9DB /* CircleOfFifthsPickerView.swift */; };
 		4CAE7C26204B05A30037C9DB /* CircleOfFifthsPickerViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAE7C25204B05A30037C9DB /* CircleOfFifthsPickerViewDelegate.swift */; };
 		4CB8E6162045197100AD293D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB8E6152045197100AD293D /* AppDelegate.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C6B2FF12075BC4300757A9F /* CircleOfFifths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleOfFifths.swift; sourceTree = "<group>"; };
 		4CAE7C21204B03D70037C9DB /* CircleOfFifthsPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleOfFifthsPickerView.swift; sourceTree = "<group>"; };
 		4CAE7C25204B05A30037C9DB /* CircleOfFifthsPickerViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleOfFifthsPickerViewDelegate.swift; sourceTree = "<group>"; };
 		4CB8E6122045197000AD293D /* ChordTransposer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChordTransposer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,6 +111,7 @@
 				4CB8E6212045197200AD293D /* Info.plist */,
 				4CAE7C21204B03D70037C9DB /* CircleOfFifthsPickerView.swift */,
 				4CAE7C25204B05A30037C9DB /* CircleOfFifthsPickerViewDelegate.swift */,
+				4C6B2FF12075BC4300757A9F /* CircleOfFifths.swift */,
 			);
 			path = ChordTransposer;
 			sourceTree = "<group>";
@@ -267,6 +270,7 @@
 			files = (
 				4CAE7C26204B05A30037C9DB /* CircleOfFifthsPickerViewDelegate.swift in Sources */,
 				4CB8E6182045197100AD293D /* ViewController.swift in Sources */,
+				4C6B2FF22075BC4300757A9F /* CircleOfFifths.swift in Sources */,
 				4CAE7C22204B03D70037C9DB /* CircleOfFifthsPickerView.swift in Sources */,
 				4CB8E6162045197100AD293D /* AppDelegate.swift in Sources */,
 			);

@@ -24,8 +24,8 @@ class CircleOfFifthsPickerViewDelegate: UIViewController, UIPickerViewDelegate, 
     let majorKeySteps: [Int] = [2, 2, 1, 2, 2, 2]
     // Minor Key chord structure:  i ii(dim) III iv v VI VII
     let minorKeySteps: [Int] = [2, 1, 2, 2, 1, 2]
-    
-    // MARK: CircleOfFifthsPickerViewDelegate methods
+
+    // MARK: CircleOfFifthsPickerDataSource methods
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -34,6 +34,7 @@ class CircleOfFifthsPickerViewDelegate: UIViewController, UIPickerViewDelegate, 
         return self.circleOfFifthsSharps.count
     }
     
+    // MARK: CircleOfFifthsPickerViewDelegate methods
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return self.circleOfFifthsSharps[row]
     }
@@ -45,7 +46,7 @@ class CircleOfFifthsPickerViewDelegate: UIViewController, UIPickerViewDelegate, 
         // self.startingKeyChords.text = constructChordsInKey(keyOffset: row, majorKey: true)
     }
     
-    // MARK: CircleOfFifthsPickerDataSource methods
+
     // Construct a string of all chords in a Key starting with the root.
     func constructChordsInKey(keyOffset keyRow: Int, majorKey: Bool) -> String {
         let modeSteps: [Int] = (majorKey ? majorKeySteps : minorKeySteps)

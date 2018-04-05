@@ -70,12 +70,16 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // FIXME: poor hack to get initializer to work right - majorKeySteps
     //    key concept: initializers in classes - empty, order of initialization, etc.
     var modeSelected: [(Int, String)] = [(0, " "), (2, "m"), (2, "m"), (1, " ") , (2, " "), (2, "m"), (2, "○")]
+    // FIXME: add vars for:
+    // startingKeyPickerViewDelegate, targetKeyPickerViewDelegate
     
     //MARK: boiler plate
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     
+        // FIXME: initialize delegates as in assignModeSelected
+        // startingKeyPickerViewDelegate = CircleOfFifthsPickerViewDelegate(modeSelectSetCtrl.selectedSegmentIndex)
         self.startingKeyPickerView.delegate = self
         self.startingKeyPickerView.dataSource = self
         //
@@ -192,10 +196,15 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func updateCapo() {
-        fretForCapo.text = String(
-            abs(((self.targetKeyPickerView.selectedRow(inComponent: 0)) -
-                (self.startingKeyPickerView.selectedRow(inComponent: 0))) % circleOfFifthsSharps.count))
-        //
+        let targetKey = self.targetKeyPickerView.selectedRow(inComponent: 0)
+        let startKey = self.startingKeyPickerView.selectedRow(inComponent: 0)
+        if (startKey <= targetKey) {
+            fretForCapo.text = String(targetKey - startKey)
+        }
+        else {
+            fretForCapo.text = String(targetKey - startKey + circleOfFifthsSharps.count)
+        }
+        /*
         let startIdx = self.startingKeyPickerView.selectedRow(inComponent: 0)
         let targetIdx = self.targetKeyPickerView.selectedRow(inComponent: 0)
         var capoVal = 0
@@ -205,11 +214,11 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             capoVal += 1
         }
         fretForCapo.text = String(capoVal)
-        //
+        */
     }
     
     //MARK: UIPickerViewDataSource
-    //MARK: UIPickerViewDelegate for Circle of Fifths
+
     
     // A CircleOfFifths picker has only one component, the single circle itself
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -226,6 +235,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         }
     }
 
+    //MARK: UIPickerViewDelegate for Circle of Fifths
     // Return the key at the given row
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return self.getKey(keyOffset: row,
