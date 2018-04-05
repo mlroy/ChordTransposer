@@ -11,7 +11,7 @@
 //
 //  Next Steps:
 //     X Create a major/minor key segmented control
-//     - Fix Capo computation
+//     X Fix Capo computation
 //     - Complete the CircleOfFiftsPickerViewDelegate and CircleOfFifthsPickerViewDataSource
 //       May be easier to have those as a single class, then split up to understand
 //     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
@@ -56,8 +56,8 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // Major Key chord structure:  I ii iii IV V vi viidim I
     // Minor Key chord structure:  i ii(dim) III iv v VI VII
     */
-    let majorKeySteps: [(Int, String)] = [(0, ""), (2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
-    let minorKeySteps: [(Int, String)] = [(0, "m"), (2, "○"), (1, ""), (2, "m"), (2, "m"), (1, ""), (2, "")]
+    let majorKeySteps: [(Int, String)] = [(0, " "), (2, "m"), (2, "m"), (1, " ") , (2, " "), (2, "m"), (2, "○")]
+    let minorKeySteps: [(Int, String)] = [(0, "m"), (2, "○"), (1, " "), (2, "m"), (2, "m"), (1, " "), (2, " ")]
     // sharps or flats selector indexes
     let sharpsSelected: Int = 0
     let flatsSelected:  Int = 1
@@ -69,7 +69,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // var targetKeyPickerDelegate :CircleOfFifthsPickerViewDelegate
     // FIXME: poor hack to get initializer to work right - majorKeySteps
     //    key concept: initializers in classes - empty, order of initialization, etc.
-    var modeSelected: [(Int, String)] = [(0, ""), (2, "m"), (2, "m"), (1, "") , (2, ""), (2, "m"), (2, "○")]
+    var modeSelected: [(Int, String)] = [(0, " "), (2, "m"), (2, "m"), (1, " ") , (2, " "), (2, "m"), (2, "○")]
     
     //MARK: boiler plate
     override func viewDidLoad() {
@@ -192,20 +192,20 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func updateCapo() {
-        self.fretForCapo.text = String(
+        fretForCapo.text = String(
             abs(((self.targetKeyPickerView.selectedRow(inComponent: 0)) -
                 (self.startingKeyPickerView.selectedRow(inComponent: 0))) % circleOfFifthsSharps.count))
-        /*
+        //
         let startIdx = self.startingKeyPickerView.selectedRow(inComponent: 0)
         let targetIdx = self.targetKeyPickerView.selectedRow(inComponent: 0)
         var capoVal = 0
         var currIdx = startIdx
         while (currIdx != targetIdx) {
-            currIdx = (currIdx + 1) % modeSelected.count
+            currIdx = (currIdx + 1) % circleOfFifthsSharps.count
             capoVal += 1
         }
         fretForCapo.text = String(capoVal)
-        */
+        //
     }
     
     //MARK: UIPickerViewDataSource
