@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import UIKit
 import os.log
 
 class CircleOfFifths: NSObject, NSCoding {
     //MARK: local constants
-    let circleOfFifthsSharps: [String] = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"]
-    let circleOfFifthsFlats: [String]  = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"]
+    static let circleOfFifthsSharps: [String] = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"]
+    static let circleOfFifthsFlats: [String]  = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"]
     
     /*
      // an array of tuples consisting of:
@@ -96,6 +97,10 @@ class CircleOfFifths: NSObject, NSCoding {
         }
     }
     
+    static func count() -> Int {
+        return circleOfFifthsSharps.count
+    }
+    
     //MARK: Worker Functions
     // assign modeSelected
     func assignModeSelected(selectedIndex: Int) {
@@ -106,10 +111,8 @@ class CircleOfFifths: NSObject, NSCoding {
         case minorModeSelected:
             modeSelected = minorKeySteps
             
-        // FIXME: change to report an error
-        //    key concept: error handling - throwing errors, etc
         default:
-            modeSelected = majorKeySteps
+            fatalError("init(coder:) has not been implemented")
         }
     }
     
@@ -119,10 +122,10 @@ class CircleOfFifths: NSObject, NSCoding {
         var returnKey: String = "invalid"
         
         if (forSharpKeys) {
-            returnKey = circleOfFifthsSharps[row]
+            returnKey = CircleOfFifths.circleOfFifthsSharps[row]
         }
         else {
-            returnKey = circleOfFifthsFlats[row]
+            returnKey = CircleOfFifths.circleOfFifthsFlats[row]
         }
         
         return returnKey
@@ -133,8 +136,7 @@ class CircleOfFifths: NSObject, NSCoding {
         return "\(getChordAtPosition(chordPosition: row, forSharpKeys: forSharpKeys))\(chordMode)"
     }
     
-    // Construct a string of all chords in a Key starting with the root.
-    func constructChordsInKey(keyOffset keyRow: Int, sharpKeys: Bool) -> String {
+    func constructChordsInKey(keyOffset keyRow: Int) -> String {
         var nextChordOffset = keyRow
         var useSharpKeys: Bool
         var chords: String = ""
@@ -148,13 +150,27 @@ class CircleOfFifths: NSObject, NSCoding {
             useSharpKeys = false
             
         default: // all others are based on sharpKeys
-            useSharpKeys = sharpKeys
+            useSharpKeys = self.sharpKeysSelected
         }
         
         for (cOffset, modeStr) in modeSelected {
-            nextChordOffset = (nextChordOffset + cOffset) % modeSelected.count
+            nextChordOffset = (nextChordOffset + cOffset) % CircleOfFifths.count()
             chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
         }
         return chords;
+    }
+    
+    // Returns the Key based on the keyOffset and sharpKeysSelected
+    func getKey(keyOffset row: Int) -> String {
+        var returnKey: String = "invalid"
+        
+        if (self.sharpKeysSelected) {
+            returnKey = CircleOfFifths.circleOfFifthsSharps[row]
+        }
+        else {
+            returnKey = CircleOfFifths.circleOfFifthsFlats[row]
+        }
+        
+        return returnKey
     }
 }

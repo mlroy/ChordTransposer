@@ -12,12 +12,10 @@
 //  Next Steps:
 //     X Create a major/minor key segmented control
 //     X Fix Capo computation
-//     - Complete the CircleOfFiftsPickerViewDelegate and CircleOfFifthsPickerViewDataSource
-//       May be easier to have those as a single class, then split up to understand
-//     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
-//     - Device adjustable display (iphone 6, 7, 8, etc), Vary For Traits in Storyboard editor
-//     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
-//     - Fixme's (fixed initializer)
+//     X Implement the originalKey and targetKey data using the CircleOfFifths class
+//     later- Device adjustable display (iphone 6, 7, 8, etc), Vary For Traits in Storyboard editor
+//     later- Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
+//     X Fixme's (fixed initializer)
 //     X Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
 //     X Convert to 2 sharp/flat key switches, one for starting and one for target keys;
 //         fix font sizes
@@ -45,19 +43,6 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     @IBOutlet weak var modeSelectSetCtrl: UISegmentedControl!
     
     //MARK: local constants
-    let circleOfFifthsSharps: [String] = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"]
-    let circleOfFifthsFlats: [String]  = ["A", "B♭", "B", "C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭"]
-    
-    /*
-    // majorKeySteps is an array of tuples consisting of:
-    //    1. the number of half-steps between the current chord and the next chord in the key.
-    //    2. a character for the mode of the chord
-    //
-    // Major Key chord structure:  I ii iii IV V vi viidim I
-    // Minor Key chord structure:  i ii(dim) III iv v VI VII
-    */
-    let majorKeySteps: [(Int, String)] = [(0, " "), (2, "m"), (2, "m"), (1, " ") , (2, " "), (2, "m"), (2, "○")]
-    let minorKeySteps: [(Int, String)] = [(0, "m"), (2, "○"), (1, " "), (2, "m"), (2, "m"), (1, " "), (2, " ")]
     // sharps or flats selector indexes
     let sharpsSelected: Int = 0
     let flatsSelected:  Int = 1
@@ -66,42 +51,37 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     let minorModeSelected: Int = 1
     
     //MARK: local vars
-    // var targetKeyPickerDelegate :CircleOfFifthsPickerViewDelegate
-    // FIXME: poor hack to get initializer to work right - majorKeySteps
-    //    key concept: initializers in classes - empty, order of initialization, etc.
-    var modeSelected: [(Int, String)] = [(0, " "), (2, "m"), (2, "m"), (1, " ") , (2, " "), (2, "m"), (2, "○")]
-    // FIXME: add vars for:
-    // startingKeyPickerViewDelegate, targetKeyPickerViewDelegate
+    var originalKey: CircleOfFifths = CircleOfFifths()
+    var targetKey: CircleOfFifths = CircleOfFifths()
     
-    //MARK: boiler plate
+    //MARK: ViewController common
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     
-        // FIXME: initialize delegates as in assignModeSelected
-        // startingKeyPickerViewDelegate = CircleOfFifthsPickerViewDelegate(modeSelectSetCtrl.selectedSegmentIndex)
         self.startingKeyPickerView.delegate = self
         self.startingKeyPickerView.dataSource = self
         //
         self.targetKeyPickerView.delegate = self
         self.targetKeyPickerView.dataSource = self
+        
         // Set initial mode
         assignModeSelected()
-        
         // Chords
         updateChords()
         // Capo
         updateCapo()
     }
-
     
     @IBAction func startingKeySharpsFlatsToggled(_ sender: UISegmentedControl) {
+        originalKey.sharpKeysSelected = (startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
         updateChords()
         startingKeyPickerView.reloadComponent(0)
         os_log("Starting Sharp Keys toggled", log: OSLog.default, type: .debug)
     }
     
     @IBAction func targetSharpsOrFlatsToggled(_ sender: Any) {
+        targetKey.sharpKeysSelected = (targetKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
         updateChords()
         targetKeyPickerView.reloadComponent(0)
         os_log("Target Sharp Keys toggled", log: OSLog.default, type: .debug)
@@ -117,82 +97,28 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         // Dispose of any resources that can be recreated.
     }
 
-    //MARK: Work functions
+    // MARK: Work functions
     
-    // assign modeSelected
     func assignModeSelected() {
         switch (modeSelectSetCtrl.selectedSegmentIndex) {
         case majorModeSelected:
-            modeSelected = majorKeySteps
+            originalKey.assignModeSelected(selectedIndex: majorModeSelected)
+            targetKey.assignModeSelected(selectedIndex: majorModeSelected)
             
         case minorModeSelected:
-            modeSelected = minorKeySteps
+            originalKey.assignModeSelected(selectedIndex: minorModeSelected)
+            targetKey.assignModeSelected(selectedIndex: minorModeSelected)
         
-        // FIXME: change to report an error
-        //    key concept: error handling - throwing errors, etc
         default:
-            modeSelected = majorKeySteps
+            fatalError("assignModeSelected for invalid segment index")
         }
-    }
-    
-    // Returns the Key based on the keyOffset and accounting for the setting of
-    // the sharpsOrFlatsSwitch
-    func getKey(keyOffset row: Int, forSharpKeys: Bool) -> String {
-        var returnKey: String = "invalid"
-        
-        if (forSharpKeys) {
-            returnKey = self.circleOfFifthsSharps[row]
-        }
-        else {
-            returnKey = self.circleOfFifthsFlats[row]
-        }
-        
-        return returnKey
-    }
-    
-    // chordMode is "min", "" (Major) or "dim" for diminished
-    func getChord(keyOffset row: Int, modeDesignator chordMode: String, forSharpKeys: Bool) -> String {
-        return "\(getKey(keyOffset: row, forSharpKeys: forSharpKeys))\(chordMode)"
-    }
-    
-    // Construct a string of all chords in a Key starting with the root.
-    func constructChordsInKey(keyOffset keyRow: Int, sharpKeys: Bool) -> String {
-        // let modeSteps: [(Int, String)] = (majorKey ? majorKeySteps : minorKeySteps)
-        var nextChordOffset = keyRow
-        var useSharpKeys: Bool
-        // Root Chord for the key
-        var chords: String = ""
-        
-        // adjust useSharpKeys based on the key
-        switch (keyRow) {
-        case 0, 2, 5, 7, 10: // Sharps only keys: (A,B,D,E,G)
-            useSharpKeys = true
-            
-        case 8:  // Flats only key: F
-            useSharpKeys = false
-            
-        default: // all others are based on sharpKeys
-            useSharpKeys = sharpKeys
-        }
-        
-        for (cOffset, modeStr) in modeSelected {
-            nextChordOffset = (nextChordOffset + cOffset) % self.circleOfFifthsSharps.count
-            chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
-        }
-        return chords;
     }
     
     func updateChords() {
-        // starting key chords
-        self.startingKeyChords.text = constructChordsInKey(
-            keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0),
-            // majorKey: true,
-            sharpKeys: self.startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
-        // target key chords
-        self.targetKeyChords.text = constructChordsInKey(
-            keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0),
-            // majorKey: true,
-            sharpKeys: targetKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
+        self.startingKeyChords.text = originalKey.constructChordsInKey(
+              keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0))
+        self.targetKeyChords.text = targetKey.constructChordsInKey(
+              keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0))
     }
     
     func updateCapo() {
@@ -202,24 +128,12 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
             fretForCapo.text = String(targetKey - startKey)
         }
         else {
-            fretForCapo.text = String(targetKey - startKey + circleOfFifthsSharps.count)
+            fretForCapo.text = String(targetKey - startKey + CircleOfFifths.count())
         }
-        /*
-        let startIdx = self.startingKeyPickerView.selectedRow(inComponent: 0)
-        let targetIdx = self.targetKeyPickerView.selectedRow(inComponent: 0)
-        var capoVal = 0
-        var currIdx = startIdx
-        while (currIdx != targetIdx) {
-            currIdx = (currIdx + 1) % circleOfFifthsSharps.count
-            capoVal += 1
-        }
-        fretForCapo.text = String(capoVal)
-        */
     }
     
     //MARK: UIPickerViewDataSource
 
-    
     // A CircleOfFifths picker has only one component, the single circle itself
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -227,21 +141,21 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     
     // The number of rows in a CircleOfFifths picker is the number of keys (sharps or flats)
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent componente: Int) -> Int {
-        if (startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected) {
-            return self.circleOfFifthsSharps.count
-        }
-        else {
-            return self.circleOfFifthsFlats.count
-        }
+        return CircleOfFifths.count()
     }
 
     //MARK: UIPickerViewDelegate for Circle of Fifths
     // Return the key at the given row
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return self.getKey(keyOffset: row,
-                           forSharpKeys: (pickerView == startingKeyPickerView) ?
-                               startingKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected :
-                               targetKeySharpsOrFlats.selectedSegmentIndex == sharpsSelected)
+        var viewString: String = "invalid"
+        
+        if (pickerView == startingKeyPickerView) {
+            viewString = originalKey.getKey(keyOffset: row)
+        }
+        else {
+            viewString = targetKey.getKey(keyOffset: row)
+        }
+        return viewString
     }
     
     // Respond to the selected key
