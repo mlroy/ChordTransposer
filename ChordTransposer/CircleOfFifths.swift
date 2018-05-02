@@ -33,26 +33,34 @@ class CircleOfFifths: NSObject, NSCoding {
     
     //MARK: local vars
     var modeSelected: [(Int, String)]
-    // var sharpKeysSelected: Boolean
+    var sharpKeysSelected: Bool
+    var keySelected: Int32
     
     //MARK: Types
     struct PropertyKey {
         static let mode = "mode"
+        static let sharps = "sharps"
+        static let key = "key"
     }
     
     override init() {
         self.modeSelected = majorKeySteps
+        self.keySelected = 0
+        self.sharpKeysSelected = true
+        
         super.init()
     }
     
     // add parameter for sharpKeysSelected
-    init(aModeIndex: Int32) {
+    init(aModeIndex: Int32, sharpKeysSelected: Bool, keySelected: Int32) {
         if (aModeIndex == 0) {
             self.modeSelected = majorKeySteps
         }
         else {
             self.modeSelected = minorKeySteps
         }
+        self.sharpKeysSelected = sharpKeysSelected
+        self.keySelected = keySelected
         
         super.init()
     }
@@ -66,12 +74,26 @@ class CircleOfFifths: NSObject, NSCoding {
             modeIndex = 1
         }
         aCoder.encode(modeIndex, forKey: PropertyKey.mode)
+        aCoder.encode(sharpKeysSelected, forKey: PropertyKey.sharps)
+        aCoder.encode(keySelected, forKey: PropertyKey.key)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        let modeIndex = aDecoder.decodeInt32(forKey: PropertyKey.mode)
+        let modeIndex = aDecoder.decodeInt32(forKey: PropertyKey.mode)   // major or minor keys
+        let sharpKeys = aDecoder.decodeBool(forKey: PropertyKey.sharps)  // sharp or flat keys
+        let theKey = aDecoder.decodeInt32(forKey: PropertyKey.key)       // the key itself
 
-        self.init(aModeIndex: modeIndex)
+        self.init(aModeIndex: modeIndex, sharpKeysSelected: sharpKeys, keySelected: theKey)
+    }
+    
+    //MARK: Interface Functions
+    func setModeSelection(toMajor major: Bool) {
+        if (major) {
+            self.modeSelected = majorKeySteps
+        }
+        else {
+            self.modeSelected = minorKeySteps
+        }
     }
     
     //MARK: Worker Functions
@@ -93,7 +115,7 @@ class CircleOfFifths: NSObject, NSCoding {
     
     // Returns the Key based on the keyOffset and accounting for the setting of
     // the sharpsOrFlatsSwitch
-    func getKey(keyOffset row: Int, forSharpKeys: Bool) -> String {
+    func getChordAtPosition(chordPosition row: Int, forSharpKeys: Bool) -> String {
         var returnKey: String = "invalid"
         
         if (forSharpKeys) {
@@ -108,7 +130,7 @@ class CircleOfFifths: NSObject, NSCoding {
     
     // chordMode is "min", "" (Major) or "dim" for diminished
     func getChord(keyOffset row: Int, modeDesignator chordMode: String, forSharpKeys: Bool) -> String {
-        return "\(getKey(keyOffset: row, forSharpKeys: forSharpKeys))\(chordMode)"
+        return "\(getChordAtPosition(chordPosition: row, forSharpKeys: forSharpKeys))\(chordMode)"
     }
     
     // Construct a string of all chords in a Key starting with the root.
@@ -130,7 +152,7 @@ class CircleOfFifths: NSObject, NSCoding {
         }
         
         for (cOffset, modeStr) in modeSelected {
-            nextChordOffset = (nextChordOffset + cOffset) % circleOfFifthsSharps.count
+            nextChordOffset = (nextChordOffset + cOffset) % modeSelected.count
             chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
         }
         return chords;

@@ -17,7 +17,7 @@
 //     - Implement the Target Key data using the CircleOfFifthsPickerViewDelegate
 //     - Device adjustable display (iphone 6, 7, 8, etc), Vary For Traits in Storyboard editor
 //     - Splash Screen (d'Arezzo, brought to you by Quebecois Engineering)
-//     - Fixme's
+//     - Fixme's (fixed initializer)
 //     X Implement Capo computation; make capo a text box, entering a number adjusts target key (picker, chords)
 //     X Convert to 2 sharp/flat key switches, one for starting and one for target keys;
 //         fix font sizes
@@ -88,7 +88,7 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         // Set initial mode
         assignModeSelected()
         
-        //
+        // Chords
         updateChords()
         // Capo
         updateCapo()
