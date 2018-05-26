@@ -35,12 +35,12 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
 
     @IBOutlet weak var startingKeySharpsOrFlats: UISegmentedControl!
     @IBOutlet weak var startingKeyPickerView: UIPickerView!
-    @IBOutlet weak var startingKeyChords: UILabel!
     @IBOutlet weak var targetKeyPickerView: UIPickerView!
-    @IBOutlet weak var targetKeyChords: UILabel!
     @IBOutlet weak var fretForCapo: UILabel!
     @IBOutlet weak var targetKeySharpsOrFlats: UISegmentedControl!
     @IBOutlet weak var modeSelectSetCtrl: UISegmentedControl!
+    @IBOutlet weak var TargetKeyStackView: UIStackView!
+    @IBOutlet weak var OriginalKeyStackView: UIStackView!
     
     //MARK: local constants
     // sharps or flats selector indexes
@@ -49,10 +49,13 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     // mode indexes
     let majorModeSelected:  Int = 0
     let minorModeSelected: Int = 1
+    var targetKeyChordArray = [UILabel]()
+    var originalKeyChordArray = [UILabel]()
     
     //MARK: local vars
     var originalKey: CircleOfFifths = CircleOfFifths()
     var targetKey: CircleOfFifths = CircleOfFifths()
+
     
     //MARK: ViewController common
     override func viewDidLoad() {
@@ -64,6 +67,13 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
         //
         self.targetKeyPickerView.delegate = self
         self.targetKeyPickerView.dataSource = self
+        for kIndex in 0...7 {
+            targetKeyChordArray.insert(UILabel(), at: kIndex)
+            TargetKeyStackView.addArrangedSubview(targetKeyChordArray[kIndex])
+            // original
+            originalKeyChordArray.insert(UILabel(), at: kIndex)
+            OriginalKeyStackView.addArrangedSubview(originalKeyChordArray[kIndex])
+        }
         
         // Set initial mode
         assignModeSelected()
@@ -115,10 +125,10 @@ class ViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func updateChords() {
-        self.startingKeyChords.text = originalKey.constructChordsInKey(
-              keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0))
-        self.targetKeyChords.text = targetKey.constructChordsInKey(
+        self.targetKey.populateChordArray(chordArray: &self.targetKeyChordArray,
               keyOffset: self.targetKeyPickerView.selectedRow(inComponent: 0))
+        self.originalKey.populateChordArray(chordArray: &self.originalKeyChordArray,
+              keyOffset: self.startingKeyPickerView.selectedRow(inComponent: 0))
     }
     
     func updateCapo() {

@@ -10,7 +10,7 @@
 		4C6B2FF22075BC4300757A9F /* CircleOfFifths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6B2FF12075BC4300757A9F /* CircleOfFifths.swift */; };
 		4CB8E6162045197100AD293D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB8E6152045197100AD293D /* AppDelegate.swift */; };
 		4CB8E6182045197100AD293D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB8E6172045197100AD293D /* ViewController.swift */; };
-		4CB8E61B2045197100AD293D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CB8E6192045197100AD293D /* Main.storyboard */; };
+		4CB8E61B2045197100AD293D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CB8E6192045197100AD293D /* Main.storyboard */; settings = {ASSET_TAGS = ("Target Key Stack", ); }; };
 		4CB8E61D2045197100AD293D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CB8E61C2045197100AD293D /* Assets.xcassets */; };
 		4CB8E6202045197200AD293D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CB8E61E2045197200AD293D /* LaunchScreen.storyboard */; };
 		4CB8E62B2045197200AD293D /* ChordTransposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB8E62A2045197200AD293D /* ChordTransposerTests.swift */; };
@@ -190,6 +190,9 @@
 		4CB8E60A2045197000AD293D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					"Target Key Stack",
+				);
 				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Quebecois Engineering";

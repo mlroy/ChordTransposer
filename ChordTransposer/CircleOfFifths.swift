@@ -136,10 +136,11 @@ class CircleOfFifths: NSObject, NSCoding {
         return "\(getChordAtPosition(chordPosition: row, forSharpKeys: forSharpKeys))\(chordMode)"
     }
     
-    func constructChordsInKey(keyOffset keyRow: Int) -> String {
-        var nextChordOffset = keyRow
+    // handles populating the text fields of the chordArray (UILabels), based
+    // on the state of the CircleOfFifths object (sharps/flats, etc)
+    fileprivate func adjustSharpsOrFlatsByKey(_ keyRow: Int) -> Bool {
+        // start with the Tonic
         var useSharpKeys: Bool
-        var chords: String = ""
         
         // adjust useSharpKeys based on the key
         switch (keyRow) {
@@ -152,12 +153,31 @@ class CircleOfFifths: NSObject, NSCoding {
         default: // all others are based on sharpKeys
             useSharpKeys = self.sharpKeysSelected
         }
+        return useSharpKeys
+    }
+    
+    func constructChordsInKey(keyOffset keyRow: Int) -> String {
+        var nextChordOffset = keyRow
+        var chords: String = ""
+        let useSharpKeys: Bool = adjustSharpsOrFlatsByKey(keyRow)
         
         for (cOffset, modeStr) in modeSelected {
             nextChordOffset = (nextChordOffset + cOffset) % CircleOfFifths.count()
             chords += "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
         }
         return chords;
+    }
+    
+    func populateChordArray( chordArray: inout [UILabel], keyOffset keyRow: Int) {
+        var nextChordOffset = keyRow
+        var chordInKey = 0
+        let useSharpKeys: Bool = adjustSharpsOrFlatsByKey(keyRow)
+        
+        for (cOffset, modeStr) in modeSelected {
+            nextChordOffset = (nextChordOffset + cOffset) % CircleOfFifths.count()
+            chordArray[chordInKey].text = "\(getChord(keyOffset: nextChordOffset, modeDesignator: modeStr, forSharpKeys: useSharpKeys)) "
+            chordInKey += 1
+        }
     }
     
     // Returns the Key based on the keyOffset and sharpKeysSelected
